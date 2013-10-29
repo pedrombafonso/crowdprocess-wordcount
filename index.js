@@ -16,26 +16,29 @@ crowdprocess(program, bid, function(err, task){
   for (var i = 0; i < textLines.length; i++) {
 
     //Data unit object
-    dataUnit = textLines[i];
+    var dataUnit = textLines[i];
     task.write(dataUnit);
     tSent++;
-  }; 
+  }
 
   //Deal with results
-  task.on('result', function(result){
+  task.on('result', handleResult);
+
+  function handleResult(result){
     tRcvd++;
 
     var words = result;
-    for (w in words) {
+    for (var w in words) {
       if (wordCounter[w]){
         wordCounter[w] += words[w];
       } else {
         wordCounter[w] = words[w];
       }
-    };
+    }
 
     if (tSent === tRcvd) {
       console.log('Words counted:\n', wordCounter);
-    };
-  });
+    }
+  }
+
 });
