@@ -6,9 +6,9 @@ function Run (data) {
   var s = data.toLowerCase();
 
   //split by comma, period, single space
-  a = s.split(/[ ,.!?:;]/);
+  var a = s.split(/[ ,.!?:;]/);
 
-  var r = {}
+  var r = {};
   while(a.length) {
     var w = a.pop();
     if (!isWord(w)) continue;
