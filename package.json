@@ -1,0 +1,25 @@
+{
+  "name": "crowdprocess-wordcount",
+  "version": "0.0.0",
+  "description": "A simple wordcount example using CrowdProcess platform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedrombafonso/crowdprocess-wordcount.git"
+  },
+  "keywords": [
+    "wordcount",
+    "crowdprocess"
+  ],
+  "author": "pedrombafonso",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/pedrombafonso/crowdprocess-wordcount/issues"
+  },
+  "dependencies": {
+    "crowdprocess": "~0.1.2"
+  }
+}
