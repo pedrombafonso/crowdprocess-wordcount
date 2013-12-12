@@ -1,15 +1,23 @@
 var crowdprocess = require('crowdprocess');
 var fs = require('fs');
+var path = require('path');
 
 //Task bid
 var bid = 1;
+var program = fs.readFileSync(path.join(__dirname, 'run.js'), 'utf8');
+var textLines = JSON.parse(fs.readFileSync(path.join(__dirname, 'osmaias_data.json'), 'utf8'));
 
-var program = fs.readFileSync('run.js', 'utf8');
-var textLines = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+// Get credentials
+var credentialsSrc = path.join(__dirname, 'credentials.json');
+var credentials = require(credentialsSrc);
+var email = credentials.email;
+var password = credentials.password;
 
-crowdprocess(program, bid, function(err, task){
+crowdprocess(program, bid, undefined, email, password, function(err, job){
 
   var tSent = 0;
+  var rRcvd = 0;
+  var eRcvd = 0;
   var tRcvd = 0;
   var wordCounter = {};
 
@@ -17,15 +25,17 @@ crowdprocess(program, bid, function(err, task){
 
     //Data unit object
     var dataUnit = textLines[i];
-    task.write(dataUnit);
+    job.write(dataUnit);
     tSent++;
-  }
+  }    
+  job.end();
 
   //Deal with results
-  task.on('result', handleResult);
+  job.on('data', handleResult);
+  job.on('error', handleErrors);
 
   function handleResult(result){
-    tRcvd++;
+    tRcvd = ++rRcvd + eRcvd;
 
     var words = result;
     for (var w in words) {
@@ -38,7 +48,13 @@ crowdprocess(program, bid, function(err, task){
 
     if (tSent === tRcvd) {
       console.log('Words counted:\n', wordCounter);
+      job.destroy();
     }
+  }
+
+  function handleErrors(error){
+    eRcvd++;
+    console.log(error);
   }
 
 });
