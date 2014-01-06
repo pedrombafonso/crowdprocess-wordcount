@@ -20,6 +20,7 @@
     "url": "https://github.com/pedrombafonso/crowdprocess-wordcount/issues"
   },
   "dependencies": {
-    "crowdprocess": "~0.3"
+    "crowdprocess": "git://github.com/CrowdProcess/node-crowdprocess.git#map",
+    "optimist": "~0.6.0"
   }
 }

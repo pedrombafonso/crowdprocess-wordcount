@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+var CrowdProcess = require('crowdprocess');
+var fs = require('fs');
+var path = require('path');
+var argv = require('optimist').argv;
+
+//Task bid
+var bid = 1;
+var program = fs.readFileSync(path.join(__dirname, 'run.js'), 'utf8');
+
+
+
+
+var textLines = JSON.parse(fs.readFileSync(path.join(__dirname, 'osmaias_data.json'), 'utf8'));
+var data = [];
+var j = 0;
+for (var i = 0; i < textLines.length; i++) {
+  var data[j].push(textLines[i]);
+  if (i % nlines === 0) {
+    j++;
+  }
+}
+
+console.log(data[0]);
+console.log(data[1]);
+
+
+
+// Get credentials
+var credentialsSrc = path.join(__dirname, 'credentials.json');
+var credentials = require(credentialsSrc);
+var email = credentials.email;
+var password = credentials.password;
+
+var crp = new CrowdProcess(email, password);
+
+crp.map(program, data, function(result) {
+  console.log(result);
+});

@@ -1,60 +1,63 @@
-var crowdprocess = require('crowdprocess');
+#!/usr/bin/env node
+var CrowdProcess = require('crowdprocess');
 var fs = require('fs');
 var path = require('path');
+var argv = require('optimist').argv;
 
-//Task bid
+// Job config
 var bid = 1;
 var program = fs.readFileSync(path.join(__dirname, 'run.js'), 'utf8');
-var textLines = JSON.parse(fs.readFileSync(path.join(__dirname, 'osmaias_data.json'), 'utf8'));
+var textLines = JSON.parse(fs.readFileSync(path.join(__dirname, 'osmaias_data_10.json'), 'utf8'));
+console.log(textLines.length);
 
-// Get credentials
+// Credentials
 var credentialsSrc = path.join(__dirname, 'credentials.json');
 var credentials = require(credentialsSrc);
 var email = credentials.email;
 var password = credentials.password;
 
-crowdprocess(program, bid, undefined, email, password, function(err, job){
+// Counters
+var totalWords = {};
+var rcvd = 0;
 
-  var tSent = 0;
-  var rRcvd = 0;
-  var eRcvd = 0;
-  var tRcvd = 0;
-  var wordCounter = {};
+var data = [];
+initData(data);
+console.log(data.length);
 
-  for (var i = 0; i < textLines.length; i++) {
+// var specialWord = argv.w;
+var wordLimit = argv.l;
+var wordsOverLimit = {};
+var wordsOverLimitCount = 0;
 
-    //Data unit object
-    var dataUnit = textLines[i];
-    job.write(dataUnit);
-    tSent++;
-  }    
-  job.end();
-
-  //Deal with results
-  job.on('data', handleResult);
-  job.on('error', handleErrors);
-
-  function handleResult(result){
-    tRcvd = ++rRcvd + eRcvd;
-
-    var words = result;
-    for (var w in words) {
-      if (wordCounter[w]){
-        wordCounter[w] += words[w];
-      } else {
-        wordCounter[w] = words[w];
-      }
+// 
+var crp = new CrowdProcess(email, password);
+crp.map(program, data, function(words) {
+  rcvd++;
+  for (w in words) {
+    if (totalWords[w]) {
+      totalWords[w] += words[w];
+    } else {
+      totalWords[w] = words[w];
     }
-
-    if (tSent === tRcvd) {
-      console.log('Words counted:\n', wordCounter);
-      job.destroy();
-    }
+    if (totalWords[w] > wordLimit && !wordsOverLimit[w]) {
+      wordsOverLimit[w] = totalWords[w];
+      console.log('New word: ' + w );
+      wordsOverLimitCount++;
+    } else {wordsOverLimit[w] += totalWords[w];}
   }
-
-  function handleErrors(error){
-    eRcvd++;
-    console.log(error);
+  if (rcvd == data.length) { 
+    console.log('# words over limit: ' + wordsOverLimitCount);
   }
-
 });
+
+function initData(data){
+  var nlines = argv.n || 10;
+  var j = 0;
+  data[j] = [];
+  for (var i = 0; i < textLines.length; i++) {
+    data[j].push(textLines[i]);
+    if (i % nlines === 0 && i !== 0) {
+      data[++j] = [];
+    }
+  }
+}
