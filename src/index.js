@@ -6,9 +6,9 @@ var argv = require('optimist').argv;
 
 // Job config
 var bid = 1;
-var program = fs.readFileSync(path.join(__dirname, 'run.js'), 'utf8');
-var textLines = JSON.parse(fs.readFileSync(path.join(__dirname, 'osmaias_data_10.json'), 'utf8'));
-console.log(textLines.length);
+var program = fs.readFileSync(path.join(__dirname, 'cp', 'run.js'), 'utf8');
+var textLines = JSON.parse(fs.readFileSync(path.join(__dirname, 'osmaias_data.json'), 'utf8'));
+// console.log(textLines.length);
 
 // Credentials
 var credentialsSrc = path.join(__dirname, 'credentials.json');
@@ -22,7 +22,7 @@ var rcvd = 0;
 
 var data = [];
 initData(data);
-console.log(data.length);
+// console.log(data.length);
 
 // var specialWord = argv.w;
 var wordLimit = argv.l;
